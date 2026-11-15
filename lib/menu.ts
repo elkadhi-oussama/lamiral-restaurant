@@ -185,3 +185,11 @@ export function formatPrice(price: number, locale: Locale): string {
     currency: "EUR",
   }).format(price);
 }
+
+export function findDish(id: string): Dish | undefined {
+  for (const category of menu) {
+    const dish = category.dishes.find((item) => item.id === id);
+    if (dish) return dish;
+  }
+  return undefined;
+}

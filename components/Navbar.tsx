@@ -4,11 +4,13 @@ import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { dictionaries, type Locale } from "@/lib/dictionaries";
+import { useCart } from "@/components/CartProvider";
 
 export default function Navbar({ locale }: { locale: Locale }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const t = dictionaries[locale].nav;
+  const { count } = useCart()
 
   const otherLocale: Locale = locale === "fr" ? "en" : "fr";
   const switchHref = pathname.replace(/^\/(fr|en)/, `/${otherLocale}`);
@@ -65,7 +67,7 @@ export default function Navbar({ locale }: { locale: Locale }) {
           <Link
             href={`/${locale}/cart`}
             aria-label={t.cart}
-            className="rounded-full bg-brand-yellow p-2 text-brand-brown transition hover:opacity-90"
+            className="relative rounded-full bg-brand-yellow p-2 text-brand-brown transition hover:opacity-90"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -81,6 +83,11 @@ export default function Navbar({ locale }: { locale: Locale }) {
               <circle cx="20" cy="21" r="1" />
               <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
             </svg>
+            {count > 0 && (
+              <span className="absolute -right-1.5 -top-1.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-brand-cream px-1 text-xs font-bold text-brand-brown">
+                {count}
+              </span>
+            )}
           </Link>
 
           {/* Mobile menu button */}

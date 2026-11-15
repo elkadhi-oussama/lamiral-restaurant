@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { dictionaries, isLocale } from "@/lib/dictionaries";
 import { menu, formatPrice } from "@/lib/menu";
+import AddToCartButton from "@/components/AddToCartButton"
 
 export default async function MenuPage({
   params,
@@ -72,6 +73,7 @@ export default async function MenuPage({
                     <p className="mt-2 text-sm text-brand-cream/70">
                       {dish.description[locale]}
                     </p>
+                    <AddToCartButton dishId={dish.id} locale={locale} />
                   </div>
                 </article>
               ))}

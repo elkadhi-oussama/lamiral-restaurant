@@ -1,0 +1,58 @@
+import type { Locale } from "@/lib/dictionaries";
+
+export const shopText = {
+  fr: {
+    add: "Ajouter",
+    added: "Ajouté ✓",
+    cartTitle: "Votre panier",
+    empty: "Votre panier est vide.",
+    backToMenu: "Retour au menu",
+    remove: "Retirer",
+    total: "Total",
+    checkout: "Passer la commande",
+    checkoutTitle: "Finaliser la commande",
+    yourDetails: "Vos informations",
+    name: "Nom complet",
+    phone: "Téléphone",
+    pickupTime: "Heure de retrait souhaitée",
+    note: "Remarque (facultatif)",
+    paymentTitle: "Paiement",
+    paymentText: "Paiement en espèces au retrait de votre commande.",
+    summary: "Récapitulatif",
+    place: "Confirmer la commande",
+    confirmedTitle: "Merci, commande reçue !",
+    orderNumber: "Numéro de commande",
+    pickupAt: "Retrait à",
+    confirmedText:
+      "Présentez-vous au restaurant à l'heure choisie. Paiement en espèces sur place.",
+    demoNote:
+      "Version de démonstration : la commande n'est pas encore envoyée au restaurant.",
+  },
+  en: {
+    add: "Add",
+    added: "Added ✓",
+    cartTitle: "Your cart",
+    empty: "Your cart is empty.",
+    backToMenu: "Back to the menu",
+    remove: "Remove",
+    total: "Total",
+    checkout: "Checkout",
+    checkoutTitle: "Complete your order",
+    yourDetails: "Your details",
+    name: "Full name",
+    phone: "Phone",
+    pickupTime: "Preferred pickup time",
+    note: "Note (optional)",
+    paymentTitle: "Payment",
+    paymentText: "Cash payment when you collect your order.",
+    summary: "Summary",
+    place: "Confirm order",
+    confirmedTitle: "Thank you, order received!",
+    orderNumber: "Order number",
+    pickupAt: "Pickup at",
+    confirmedText:
+      "Come to the restaurant at the chosen time. Cash payment on site.",
+    demoNote:
+      "Demo version: the order is not yet sent to the restaurant.",
+  },
+} satisfies Record<Locale, Record<string, string>>;
