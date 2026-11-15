@@ -7,6 +7,7 @@ import { prisma } from "@/lib/prisma";
 import { frenchPhoneSchema } from "@/lib/phone";
 import { createSession, deleteSession } from "@/lib/session";
 import { authText } from "@/lib/auth-text";
+import { encryptField } from "@/lib/crypto"
 
 type Lang = "fr" | "en";
 const toLang = (locale: string): Lang => (locale === "en" ? "en" : "fr");
@@ -47,7 +48,7 @@ export async function register(locale: string, input: unknown) {
   try {
     // The role is never read from the form: new accounts are always CUSTOMER
     const user = await prisma.user.create({
-      data: { name, email, phone, passwordHash },
+      data: { name, email, phone: encryptField(phone), passwordHash },
     });
     userId = user.id;
   } catch (error) {

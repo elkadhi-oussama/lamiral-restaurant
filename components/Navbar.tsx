@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState } from "react";
@@ -23,7 +22,6 @@ export default function Navbar({
   const { count } = useCart();
 
   const otherLocale: Locale = locale === "fr" ? "en" : "fr";
-
   const switchHref = pathname.replace(/^\/(fr|en)/, `/${otherLocale}`);
 
   const links = [
@@ -35,15 +33,12 @@ export default function Navbar({
   ];
 
   function isActive(href: string) {
-    return href === `/${locale}`
-      ? pathname === href
-      : pathname.startsWith(href);
+    return href === `/${locale}` ? pathname === href : pathname.startsWith(href);
   }
 
   return (
     <header className="sticky top-0 z-30 border-b border-brand-yellow/20 bg-brand-brown">
       <nav className="mx-auto flex h-[72px] max-w-6xl items-center justify-between px-6">
-        {/* Logo */}
         <Link
           href={`/${locale}`}
           onClick={() => setOpen(false)}
@@ -53,16 +48,13 @@ export default function Navbar({
           L&apos;Amiral
         </Link>
 
-        {/* Desktop links */}
         <div className="hidden items-center gap-8 md:flex">
           {links.map((link) => (
             <Link
               key={link.href}
               href={link.href}
               className={`text-sm uppercase tracking-widest transition hover:text-brand-yellow ${
-                isActive(link.href)
-                  ? "text-brand-yellow"
-                  : "text-brand-cream/80"
+                isActive(link.href) ? "text-brand-yellow" : "text-brand-cream/80"
               }`}
             >
               {link.label}
@@ -70,7 +62,6 @@ export default function Navbar({
           ))}
         </div>
 
-        {/* Right side */}
         <div className="flex items-center gap-3">
           {user && (
             <form action={logout.bind(null, locale)} className="hidden md:block">
@@ -109,7 +100,6 @@ export default function Navbar({
               <circle cx="20" cy="21" r="1" />
               <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
             </svg>
-
             {count > 0 && (
               <span className="absolute -right-1.5 -top-1.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-brand-cream px-1 text-xs font-bold text-brand-brown">
                 {count}
@@ -117,7 +107,6 @@ export default function Navbar({
             )}
           </Link>
 
-          {/* Mobile menu button */}
           <button
             type="button"
             onClick={() => setOpen((value) => !value)}
@@ -144,7 +133,6 @@ export default function Navbar({
         </div>
       </nav>
 
-      {/* Mobile panel */}
       {open && (
         <div className="border-t border-brand-yellow/20 bg-brand-brown md:hidden">
           <div className="mx-auto flex max-w-6xl flex-col px-6 py-2">
@@ -153,16 +141,13 @@ export default function Navbar({
                 key={link.href}
                 href={link.href}
                 onClick={() => setOpen(false)}
-                className={`border-b border-brand-yellow/10 py-3 text-sm uppercase tracking-widest last:border-b-0 ${
-                  isActive(link.href)
-                    ? "text-brand-yellow"
-                    : "text-brand-cream/80"
+                className={`border-b border-brand-yellow/10 py-3 text-sm uppercase tracking-widest ${
+                  isActive(link.href) ? "text-brand-yellow" : "text-brand-cream/80"
                 }`}
               >
                 {link.label}
               </Link>
             ))}
-
             {user && (
               <form action={logout.bind(null, locale)} className="py-3">
                 <button

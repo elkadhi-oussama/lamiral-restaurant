@@ -5,6 +5,7 @@ import { z } from "zod";
 import { prisma } from "@/lib/prisma";
 import { frenchPhoneSchema } from "@/lib/phone";
 import { getCurrentUser } from "@/lib/session";
+import { encryptField } from "@/lib/crypto";
 
 const orderSchema = z.object({
   name: z.string().trim().min(2).max(80),
@@ -127,7 +128,7 @@ export async function placeOrder(locale: "fr" | "en", input: unknown) {
           number,
           userId: user.id,
           customerName: data.name,
-          customerPhone: data.phone,
+          customerPhone: encryptField(data.phone),
           pickupTime: data.pickupTime,
           note: data.note || null,
           totalCents,
