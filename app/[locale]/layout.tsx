@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import Navbar from "@/components/Navbar";
 import { isLocale, locales } from "@/lib/dictionaries";
 import { CartProvider } from "@/components/CartProvider";
+import Footer from "@/components/Footer";
 
 export function generateStaticParams() {
   return locales.map((locale) => ({ locale }));
@@ -28,6 +29,7 @@ export default async function LocaleLayout({
         <Navbar locale={locale} />
       </Suspense>
       {children}
+      <Footer locale={locale} />
     </CartProvider>
   );
 }
