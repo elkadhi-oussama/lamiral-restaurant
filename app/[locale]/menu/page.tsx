@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { dictionaries, isLocale } from "@/lib/dictionaries";
 import { menu, formatPrice } from "@/lib/menu";
-import AddToCartButton from "@/components/AddToCartButton"
+import AddToCartButton from "@/components/AddToCartButton";
 
 export default async function MenuPage({
   params,
@@ -11,7 +11,6 @@ export default async function MenuPage({
   const { locale } = await params;
   if (!isLocale(locale)) notFound();
 
-  
   const t = dictionaries[locale].menuPage;
 
   return (
@@ -56,12 +55,12 @@ export default async function MenuPage({
               {category.dishes.map((dish) => (
                 <article
                   key={dish.id}
-                  className="overflow-hidden rounded-2xl border border-brand-yellow/20 bg-brand-brown-light"
+                  className="flex flex-col overflow-hidden rounded-2xl border border-brand-yellow/20 bg-brand-brown-light"
                 >
                   <div className="flex h-36 items-center justify-center bg-brand-brown text-6xl">
                     {dish.emoji}
                   </div>
-                  <div className="p-5">
+                  <div className="flex flex-1 flex-col p-5">
                     <div className="flex items-start justify-between gap-3">
                       <h3 className="font-semibold text-brand-cream">
                         {dish.name[locale]}
@@ -70,7 +69,7 @@ export default async function MenuPage({
                         {formatPrice(dish.price, locale)}
                       </span>
                     </div>
-                    <p className="mt-2 text-sm text-brand-cream/70">
+                    <p className="mt-2 flex-1 text-sm text-brand-cream/70">
                       {dish.description[locale]}
                     </p>
                     <AddToCartButton dishId={dish.id} locale={locale} />

@@ -14,7 +14,7 @@ export default async function Home({
   const { locale } = await params;
   if (!isLocale(locale)) notFound();
   const t = dictionaries[locale].home;
-    const h = homeText[locale];
+  const h = homeText[locale];
   const popularDishes = popularDishIds
     .map((id) => findDish(id))
     .filter((dish) => dish !== undefined);
@@ -61,7 +61,7 @@ export default async function Home({
         </div>
       </section>
 
-            {/* Popular dishes */}
+      {/* Popular dishes */}
       <section className="px-6 py-20">
         <div className="mx-auto max-w-6xl">
           <h2 className="text-center font-[family-name:var(--font-display)] text-4xl font-bold italic text-brand-yellow">
@@ -72,19 +72,19 @@ export default async function Home({
             {popularDishes.map((dish) => (
               <article
                 key={dish.id}
-                className="overflow-hidden rounded-2xl border border-brand-yellow/20 bg-brand-brown-light"
+                className="flex flex-col overflow-hidden rounded-2xl border border-brand-yellow/20 bg-brand-brown-light"
               >
                 <div className="flex h-32 items-center justify-center bg-brand-brown text-6xl">
                   {dish.emoji}
                 </div>
-                <div className="p-5">
+                <div className="flex flex-1 flex-col p-5">
                   <div className="flex items-start justify-between gap-3">
                     <h3 className="font-semibold">{dish.name[locale]}</h3>
                     <span className="shrink-0 font-semibold text-brand-yellow">
                       {formatPrice(dish.price, locale)}
                     </span>
                   </div>
-                  <p className="mt-2 text-sm text-brand-cream/70">
+                  <p className="mt-2 flex-1 text-sm text-brand-cream/70">
                     {dish.description[locale]}
                   </p>
                   <AddToCartButton dishId={dish.id} locale={locale} />
