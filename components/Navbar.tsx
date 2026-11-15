@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from "react";
@@ -5,24 +6,38 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { dictionaries, type Locale } from "@/lib/dictionaries";
 import { useCart } from "@/components/CartProvider";
+import { authText } from "@/lib/auth-text";
+import { logout } from "@/lib/auth-actions";
 
-export default function Navbar({ locale }: { locale: Locale }) {
+export default function Navbar({
+  locale,
+  user,
+}: {
+  locale: Locale;
+  user: { name: string } | null;
+}) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const t = dictionaries[locale].nav;
-  const { count } = useCart()
+  const a = authText[locale];
+  const { count } = useCart();
 
   const otherLocale: Locale = locale === "fr" ? "en" : "fr";
+
   const switchHref = pathname.replace(/^\/(fr|en)/, `/${otherLocale}`);
 
   const links = [
     { href: `/${locale}`, label: t.home },
     { href: `/${locale}/menu`, label: t.menu },
-    { href: `/${locale}/login`, label: t.login },
+    user
+      ? { href: `/${locale}/account`, label: a.account }
+      : { href: `/${locale}/login`, label: t.login },
   ];
 
   function isActive(href: string) {
-    return href === `/${locale}` ? pathname === href : pathname.startsWith(href);
+    return href === `/${locale}`
+      ? pathname === href
+      : pathname.startsWith(href);
   }
 
   return (
@@ -57,6 +72,17 @@ export default function Navbar({ locale }: { locale: Locale }) {
 
         {/* Right side */}
         <div className="flex items-center gap-3">
+          {user && (
+            <form action={logout.bind(null, locale)} className="hidden md:block">
+              <button
+                type="submit"
+                className="text-sm text-brand-cream/70 transition hover:text-brand-yellow"
+              >
+                {a.logout}
+              </button>
+            </form>
+          )}
+
           <Link
             href={switchHref}
             className="rounded-full border border-brand-yellow px-3 py-1 text-sm font-semibold uppercase text-brand-yellow transition hover:bg-brand-yellow hover:text-brand-brown"
@@ -83,6 +109,7 @@ export default function Navbar({ locale }: { locale: Locale }) {
               <circle cx="20" cy="21" r="1" />
               <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
             </svg>
+
             {count > 0 && (
               <span className="absolute -right-1.5 -top-1.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-brand-cream px-1 text-xs font-bold text-brand-brown">
                 {count}
@@ -135,6 +162,17 @@ export default function Navbar({ locale }: { locale: Locale }) {
                 {link.label}
               </Link>
             ))}
+
+            {user && (
+              <form action={logout.bind(null, locale)} className="py-3">
+                <button
+                  type="submit"
+                  className="text-sm uppercase tracking-widest text-brand-cream/80"
+                >
+                  {a.logout}
+                </button>
+              </form>
+            )}
           </div>
         </div>
       )}
