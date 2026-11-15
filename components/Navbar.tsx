@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from "react";
@@ -13,7 +14,7 @@ export default function Navbar({
   user,
 }: {
   locale: Locale;
-  user: { name: string } | null;
+  user: { name: string; role: string } | null;
 }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
@@ -30,6 +31,7 @@ export default function Navbar({
     user
       ? { href: `/${locale}/account`, label: a.account }
       : { href: `/${locale}/login`, label: t.login },
+    ...(user?.role === "ADMIN" ? [{ href: "/admin", label: a.admin }] : []),
   ];
 
   function isActive(href: string) {
@@ -100,6 +102,7 @@ export default function Navbar({
               <circle cx="20" cy="21" r="1" />
               <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
             </svg>
+
             {count > 0 && (
               <span className="absolute -right-1.5 -top-1.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-brand-cream px-1 text-xs font-bold text-brand-brown">
                 {count}
@@ -142,12 +145,15 @@ export default function Navbar({
                 href={link.href}
                 onClick={() => setOpen(false)}
                 className={`border-b border-brand-yellow/10 py-3 text-sm uppercase tracking-widest ${
-                  isActive(link.href) ? "text-brand-yellow" : "text-brand-cream/80"
+                  isActive(link.href)
+                    ? "text-brand-yellow"
+                    : "text-brand-cream/80"
                 }`}
               >
                 {link.label}
               </Link>
             ))}
+
             {user && (
               <form action={logout.bind(null, locale)} className="py-3">
                 <button

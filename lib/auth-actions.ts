@@ -75,6 +75,7 @@ export async function login(locale: string, input: unknown) {
   const user = await prisma.user.findUnique({ where: { email } });
   const valid = await bcrypt.compare(password, user?.passwordHash ?? DUMMY_HASH);
   if (!user || !valid) return { error: t.wrongCreds };
+  if (user.restricted) return { error: t.restricted };
 
   await createSession(user.id);
   redirect(destination(language, next));

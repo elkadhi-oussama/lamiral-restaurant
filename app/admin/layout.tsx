@@ -8,6 +8,11 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
+const tabs = [
+  { href: "/admin", label: "Commandes" },
+  { href: "/admin/users", label: "Clients" },
+];
+
 export default async function AdminLayout({
   children,
 }: {
@@ -42,6 +47,17 @@ export default async function AdminLayout({
             </form>
           </div>
         </div>
+        <nav className="mx-auto flex max-w-6xl gap-6 px-6 pb-3 text-sm uppercase tracking-widest">
+          {tabs.map((tab) => (
+            <Link
+              key={tab.href}
+              href={tab.href}
+              className="text-brand-cream/80 hover:text-brand-yellow"
+            >
+              {tab.label}
+            </Link>
+          ))}
+        </nav>
       </header>
       {children}
     </div>

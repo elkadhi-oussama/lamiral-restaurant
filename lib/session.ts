@@ -66,10 +66,11 @@ export const getCurrentUser = cache(async () => {
         email: true,
         phone: true,
         role: true,
+        restricted: true,
       },
     });
 
-    if (!user) return null;
+    if (!user || user.restricted) return null;
 
     return {
       ...user,

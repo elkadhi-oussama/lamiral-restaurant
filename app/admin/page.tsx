@@ -1,3 +1,4 @@
+
 import Link from "next/link";
 import { requireAdmin } from "@/lib/admin";
 import { prisma } from "@/lib/prisma";
@@ -5,7 +6,13 @@ import { decryptField } from "@/lib/crypto";
 import { formatPhone } from "@/lib/phone";
 import { formatPrice } from "@/lib/menu";
 import { statusInfo, transitions } from "@/lib/order-status";
-import { updateOrderStatus } from "@/app/admin/actions";
+import {
+  deleteOrder,
+  forceOrderStatus,
+  updateOrderDetails,
+  updateOrderStatus,
+} from "@/app/admin/actions";
+import ConfirmButton from "@/components/ConfirmButton";
 import AutoRefresh from "@/components/AutoRefresh";
 
 const FILTERS = {
@@ -35,7 +42,9 @@ export default async function AdminOrdersPage({
   const [orders, pendingCount] = await Promise.all([
     prisma.order.findMany({
       where: statuses ? { status: { in: [...statuses] } } : {},
-      orderBy: { createdAt: key === "active" || key === "pending" ? "asc" : "desc" },
+      orderBy: {
+        createdAt: key === "active" || key === "pending" ? "asc" : "desc",
+      },
       take: 100,
       include: { items: { include: { dish: true } } },
     }),
@@ -56,6 +65,7 @@ export default async function AdminOrdersPage({
         <h1 className="font-[family-name:var(--font-display)] text-4xl font-bold italic text-brand-yellow">
           Commandes
         </h1>
+
         <nav className="flex flex-wrap gap-2">
           {(Object.keys(FILTERS) as FilterKey[]).map((filterKey) => (
             <Link
@@ -68,7 +78,8 @@ export default async function AdminOrdersPage({
               }`}
             >
               {FILTERS[filterKey].label}
-              {filterKey === "pending" && pendingCount > 0 && ` (${pendingCount})`}
+              {filterKey === "pending" && pendingCount > 0 &&
+                ` (${pendingCount})`}
             </Link>
           ))}
         </nav>
@@ -101,8 +112,11 @@ export default async function AdminOrdersPage({
                       Reçue le {dateFormat.format(order.createdAt)}
                     </p>
                   </div>
+
                   <span
-                    className={`rounded-full px-3 py-1 text-xs font-semibold ${info?.badge ?? ""}`}
+                    className={`rounded-full px-3 py-1 text-xs font-semibold ${
+                      info?.badge ?? ""
+                    }`}
                   >
                     {info?.label ?? order.status}
                   </span>
@@ -112,6 +126,7 @@ export default async function AdminOrdersPage({
                   <div className="text-sm">
                     <p className="text-brand-cream/60">Client</p>
                     <p className="font-semibold">{order.customerName}</p>
+
                     <p className="mt-1">
                       {phone ? (
                         <a
@@ -126,10 +141,14 @@ export default async function AdminOrdersPage({
                         </span>
                       )}
                     </p>
-                    <p className="mt-3 text-brand-cream/60">Retrait prévu à</p>
+
+                    <p className="mt-3 text-brand-cream/60">
+                      Retrait prévu à
+                    </p>
                     <p className="text-lg font-bold text-brand-yellow">
                       {order.pickupTime}
                     </p>
+
                     {order.note && (
                       <p className="mt-3 rounded-lg bg-brand-brown p-3 text-brand-cream/80">
                         💬 {order.note}
@@ -140,9 +159,13 @@ export default async function AdminOrdersPage({
                   <div className="text-sm">
                     <ul className="space-y-1">
                       {order.items.map((item) => (
-                        <li key={item.id} className="flex justify-between gap-3">
+                        <li
+                          key={item.id}
+                          className="flex justify-between gap-3"
+                        >
                           <span>
-                            {item.quantity} × {item.dish?.nameFr ?? item.nameSnapshot}
+                            {item.quantity} ×{" "}
+                            {item.dish?.nameFr ?? item.nameSnapshot}
                           </span>
                           <span className="shrink-0">
                             {formatPrice(
@@ -153,6 +176,7 @@ export default async function AdminOrdersPage({
                         </li>
                       ))}
                     </ul>
+
                     <p className="mt-3 flex justify-between border-t border-brand-yellow/20 pt-3 text-base font-bold">
                       <span>Total (espèces)</span>
                       <span className="text-brand-yellow">
@@ -165,11 +189,21 @@ export default async function AdminOrdersPage({
                 {nextStatuses.length > 0 && (
                   <div className="mt-5 flex flex-wrap gap-3">
                     {nextStatuses.map((next) => {
-                      const negative = next === "REJECTED" || next === "CANCELLED";
+                      const negative =
+                        next === "REJECTED" || next === "CANCELLED";
+
                       return (
                         <form key={next} action={updateOrderStatus}>
-                          <input type="hidden" name="orderId" value={order.id} />
-                          <input type="hidden" name="status" value={next} />
+                          <input
+                            type="hidden"
+                            name="orderId"
+                            value={order.id}
+                          />
+                          <input
+                            type="hidden"
+                            name="status"
+                            value={next}
+                          />
                           <button
                             type="submit"
                             className={`rounded-full px-5 py-2 text-sm font-semibold transition ${
@@ -185,6 +219,89 @@ export default async function AdminOrdersPage({
                     })}
                   </div>
                 )}
+
+                <details className="mt-4 text-sm">
+                  <summary className="cursor-pointer text-brand-cream/60">
+                    Options avancées
+                  </summary>
+
+                  <div className="mt-3 space-y-3">
+                    <form
+                      action={updateOrderDetails}
+                      className="flex flex-wrap items-center gap-2"
+                    >
+                      <input
+                        type="hidden"
+                        name="orderId"
+                        value={order.id}
+                      />
+                      <input
+                        type="time"
+                        name="pickupTime"
+                        defaultValue={order.pickupTime}
+                        required
+                        className="rounded-lg border border-brand-yellow/30 bg-brand-brown px-3 py-1.5"
+                      />
+                      <input
+                        name="note"
+                        defaultValue={order.note ?? ""}
+                        maxLength={300}
+                        placeholder="Remarque"
+                        className="min-w-48 flex-1 rounded-lg border border-brand-yellow/30 bg-brand-brown px-3 py-1.5"
+                      />
+                      <button
+                        type="submit"
+                        className="rounded-full bg-brand-yellow px-5 py-1.5 font-semibold text-brand-brown"
+                      >
+                        Enregistrer
+                      </button>
+                    </form>
+
+                    <div className="flex flex-wrap items-center gap-3">
+                      <form
+                        action={forceOrderStatus}
+                        className="flex items-center gap-2"
+                      >
+                        <input
+                          type="hidden"
+                          name="orderId"
+                          value={order.id}
+                        />
+                        <select
+                          name="status"
+                          defaultValue={order.status}
+                          className="rounded-lg border border-brand-yellow/30 bg-brand-brown px-3 py-1.5"
+                        >
+                          {Object.entries(statusInfo).map(([value, item]) => (
+                            <option key={value} value={value}>
+                              {item.label}
+                            </option>
+                          ))}
+                        </select>
+                        <button
+                          type="submit"
+                          className="rounded-full border border-brand-yellow px-5 py-1.5 font-semibold text-brand-yellow"
+                        >
+                          Forcer le statut
+                        </button>
+                      </form>
+
+                      <form action={deleteOrder}>
+                        <input
+                          type="hidden"
+                          name="orderId"
+                          value={order.id}
+                        />
+                        <ConfirmButton
+                          message="Supprimer définitivement cette commande ?"
+                          className="rounded-full border border-red-400 px-5 py-1.5 font-semibold text-red-300 hover:bg-red-500/10"
+                        >
+                          Supprimer la commande
+                        </ConfirmButton>
+                      </form>
+                    </div>
+                  </div>
+                </details>
               </li>
             );
           })}

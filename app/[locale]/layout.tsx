@@ -29,7 +29,7 @@ export default async function LocaleLayout({
           <header className="h-[72px] border-b border-brand-yellow/20 bg-brand-brown" />
         }
       >
-        <Navbar locale={locale} user={user ? { name: user.name } : null} />
+        <Navbar locale={locale} user={user ? { name: user.name, role: user.role } : null} />
       </Suspense>
       {children}
       <Footer locale={locale} />

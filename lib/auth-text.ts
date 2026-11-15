@@ -20,6 +20,8 @@ export const authText = {
     wrongCreds: "E-mail ou mot de passe incorrect.",
     emailTaken: "Un compte existe déjà avec cet e-mail.",
     failed: "Une erreur est survenue. Réessayez.",
+    restricted: "Ce compte est suspendu. Contactez le restaurant.",
+    admin: "Administration",
   },
   en: {
     login: "Login",
@@ -40,5 +42,7 @@ export const authText = {
     wrongCreds: "Incorrect email or password.",
     emailTaken: "An account already exists with this email.",
     failed: "Something went wrong. Please try again.",
+    restricted: "This account is suspended. Please contact the restaurant.",
+    admin: "Dashboard",
   },
 } satisfies Record<Locale, Record<string, string>>;
