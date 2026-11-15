@@ -1,0 +1,95 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  CUSTOMER
+  ADMIN
+}
+
+enum OrderStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+  PREPARING
+  READY
+  COMPLETED
+  CANCELLED
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  name         String
+  phone        String?
+  role         Role     @default(CUSTOMER)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  orders       Order[]
+}
+
+model Category {
+  id        String   @id @default(cuid())
+  slug      String   @unique
+  nameFr    String
+  nameEn    String
+  position  Int      @default(0)
+  dishes    Dish[]
+}
+
+model Dish {
+  id            String      @id @default(cuid())
+  slug          String      @unique
+  categoryId    String
+  category      Category    @relation(fields: [categoryId], references: [id])
+  nameFr        String
+  nameEn        String
+  descriptionFr String
+  descriptionEn String
+  priceCents    Int
+  imageUrl      String?
+  emoji         String?
+  available     Boolean     @default(true)
+  position      Int         @default(0)
+  orderItems    OrderItem[]
+
+  @@index([categoryId])
+}
+
+model Order {
+  id            String      @id @default(cuid())
+  number        String      @unique
+  status        OrderStatus @default(PENDING)
+  userId        String?
+  user          User?       @relation(fields: [userId], references: [id])
+  customerName  String
+  customerPhone String
+  pickupTime    String
+  note          String?
+  totalCents    Int
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  items         OrderItem[]
+
+  @@index([status])
+  @@index([userId])
+}
+
+model OrderItem {
+  id             String @id @default(cuid())
+  orderId        String
+  order          Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  dishId         String?
+  dish           Dish?  @relation(fields: [dishId], references: [id], onDelete: SetNull)
+  nameSnapshot   String
+  unitPriceCents Int
+  quantity       Int
+
+  @@index([orderId])
+}

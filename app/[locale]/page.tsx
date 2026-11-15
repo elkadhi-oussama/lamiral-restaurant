@@ -3,8 +3,11 @@ import { notFound } from "next/navigation";
 import { dictionaries, isLocale } from "@/lib/dictionaries";
 import { restaurant } from "@/lib/restaurant";
 import AddToCartButton from "@/components/AddToCartButton";
-import { findDish, formatPrice } from "@/lib/menu";
+import { formatPrice } from "@/lib/menu";
+import { getDishesBySlugs } from "@/lib/menu-db";
 import { homeText, popularDishIds } from "@/lib/home-text";
+
+export const dynamic = "force-dynamic";
 
 export default async function Home({
   params,
@@ -15,9 +18,7 @@ export default async function Home({
   if (!isLocale(locale)) notFound();
   const t = dictionaries[locale].home;
   const h = homeText[locale];
-  const popularDishes = popularDishIds
-    .map((id) => findDish(id))
-    .filter((dish) => dish !== undefined);
+  const popularDishes = await getDishesBySlugs(popularDishIds);
 
   return (
     <main>

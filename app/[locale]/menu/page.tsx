@@ -1,7 +1,10 @@
 import { notFound } from "next/navigation";
 import { dictionaries, isLocale } from "@/lib/dictionaries";
-import { menu, formatPrice } from "@/lib/menu";
 import AddToCartButton from "@/components/AddToCartButton";
+import { formatPrice } from "@/lib/menu";
+import { getMenu } from "@/lib/menu-db";
+
+export const dynamic = "force-dynamic";
 
 export default async function MenuPage({
   params,
@@ -12,6 +15,7 @@ export default async function MenuPage({
   if (!isLocale(locale)) notFound();
 
   const t = dictionaries[locale].menuPage;
+  const menu = await getMenu();
 
   return (
     <main>
