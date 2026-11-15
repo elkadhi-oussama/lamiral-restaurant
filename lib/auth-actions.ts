@@ -17,7 +17,9 @@ const DUMMY_HASH = bcrypt.hashSync("not-a-real-password", 12);
 
 // Only two safe destinations: no open redirects
 function destination(language: Lang, next?: string) {
-  return next === "checkout" ? `/${language}/checkout` : `/${language}`;
+  if (next === "checkout") return `/${language}/checkout`;
+  if (next === "admin") return "/admin";
+  return `/${language}`;
 }
 
 const registerSchema = z.object({

@@ -11,3 +11,10 @@ export const frenchPhoneSchema = z
   .trim()
   .refine((value) => normalizeFrenchPhone(value) !== null)
   .transform((value) => normalizeFrenchPhone(value) as string);
+
+// "0612345678" -> "06 12 34 56 78"
+export function formatPhone(national: string): string {
+  return /^0\d{9}$/.test(national)
+    ? national.replace(/(\d{2})(?=\d)/g, "$1 ")
+    : national;
+}
