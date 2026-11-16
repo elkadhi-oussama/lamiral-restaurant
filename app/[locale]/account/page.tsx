@@ -7,6 +7,7 @@ import { prisma } from "@/lib/prisma";
 import { formatPrice } from "@/lib/menu";
 import { accountText } from "@/lib/account-text";
 import { authText } from "@/lib/auth-text";
+import { profileText } from "@/lib/profile-text";
 import { logout } from "@/lib/auth-actions";
 
 export default async function AccountPage({
@@ -24,6 +25,7 @@ export default async function AccountPage({
 
   const t = accountText[locale];
   const a = authText[locale];
+  const p = profileText[locale];
 
   // Only this customer's orders
   const orders = await prisma.order.findMany({
@@ -53,6 +55,27 @@ export default async function AccountPage({
         <h2 className="text-lg font-semibold text-brand-yellow">
           {t.profile}
         </h2>
+
+        <div className="mt-4 flex items-center gap-4">
+          {user.avatarUrl ? (
+            <img
+              src={user.avatarUrl}
+              alt=""
+              className="h-16 w-16 rounded-full object-cover"
+            />
+          ) : (
+            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-brand-yellow text-2xl font-bold text-brand-brown">
+              {user.name.charAt(0).toUpperCase()}
+            </div>
+          )}
+
+          <Link
+            href={`/${locale}/account/profile`}
+            className="text-sm text-brand-yellow underline"
+          >
+            {p.edit}
+          </Link>
+        </div>
 
         <dl className="mt-4 space-y-2 text-sm">
           <div className="flex justify-between gap-4">

@@ -22,6 +22,8 @@ export const authText = {
     failed: "Une erreur est survenue. Réessayez.",
     restricted: "Ce compte est suspendu. Contactez le restaurant.",
     admin: "Administration",
+    orderNeedsAccount:
+      "Pour passer commande, veuillez créer un compte ou vous connecter.", // in fr
   },
   en: {
     login: "Login",
@@ -44,5 +46,6 @@ export const authText = {
     failed: "Something went wrong. Please try again.",
     restricted: "This account is suspended. Please contact the restaurant.",
     admin: "Dashboard",
+    orderNeedsAccount: "Please create an account to place an order.",
   },
 } satisfies Record<Locale, Record<string, string>>;

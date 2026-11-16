@@ -67,6 +67,7 @@ export const getCurrentUser = cache(async () => {
         phone: true,
         role: true,
         restricted: true,
+        avatarUrl: true,
       },
     });
 

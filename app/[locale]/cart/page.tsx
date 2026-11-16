@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import CartView from "@/components/CartView";
 import { isLocale } from "@/lib/dictionaries";
+import { getCurrentUser } from "@/lib/session";
 
 export default async function CartPage({
   params,
@@ -10,5 +11,6 @@ export default async function CartPage({
   const { locale } = await params;
   if (!isLocale(locale)) notFound();
 
-  return <CartView locale={locale} />;
+  const user = await getCurrentUser();
+  return <CartView locale={locale} loggedIn={Boolean(user)} />;
 }

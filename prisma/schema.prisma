@@ -34,6 +34,8 @@ model User {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
   orders       Order[]
+  address      String?
+  avatarUrl    String?
 }
 
 model Category {
@@ -94,4 +96,17 @@ model OrderItem {
   quantity       Int
 
   @@index([orderId])
+}
+enum ImageKind {
+  AVATAR
+  DISH
+}
+
+model Image {
+  id        String    @id @default(cuid())
+  kind      ImageKind
+  ownerId   String?
+  mimeType  String
+  data      Bytes
+  createdAt DateTime  @default(now())
 }

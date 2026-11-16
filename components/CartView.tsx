@@ -1,3 +1,4 @@
+
 "use client";
 
 import Link from "next/link";
@@ -5,10 +6,18 @@ import { useCart } from "@/components/CartProvider";
 import type { Locale } from "@/lib/dictionaries";
 import { findDish, formatPrice } from "@/lib/menu";
 import { shopText } from "@/lib/shop-text";
+import { authText } from "@/lib/auth-text";
 
-export default function CartView({ locale }: { locale: Locale }) {
+export default function CartView({
+  locale,
+  loggedIn,
+}: {
+  locale: Locale;
+  loggedIn: boolean;
+}) {
   const { lines, total, setQty, remove } = useCart();
   const t = shopText[locale];
+  const a = authText[locale];
 
   return (
     <main className="mx-auto max-w-3xl px-6 py-16">
@@ -32,6 +41,7 @@ export default function CartView({ locale }: { locale: Locale }) {
             {lines.map((line) => {
               const dish = findDish(line.id);
               if (!dish) return null;
+
               return (
                 <li
                   key={line.id}
@@ -62,7 +72,9 @@ export default function CartView({ locale }: { locale: Locale }) {
                     >
                       −
                     </button>
+
                     <span className="w-5 text-center">{line.qty}</span>
+
                     <button
                       type="button"
                       onClick={() => setQty(line.id, line.qty + 1)}
@@ -84,12 +96,36 @@ export default function CartView({ locale }: { locale: Locale }) {
             </span>
           </div>
 
-          <Link
-            href={`/${locale}/checkout`}
-            className="mt-8 block rounded-full bg-brand-yellow py-3 text-center font-semibold text-brand-brown transition hover:opacity-90"
-          >
-            {t.checkout}
-          </Link>
+          {loggedIn ? (
+            <Link
+              href={`/${locale}/checkout`}
+              className="mt-8 block rounded-full bg-brand-yellow py-3 text-center font-semibold text-brand-brown transition hover:opacity-90"
+            >
+              {t.checkout}
+            </Link>
+          ) : (
+            <div className="mt-8 rounded-2xl border border-brand-yellow bg-brand-brown-light p-5 text-center">
+              <p className="font-semibold text-brand-yellow">
+                {a.orderNeedsAccount}
+              </p>
+
+              <div className="mt-4 flex flex-wrap justify-center gap-3">
+                <Link
+                  href={`/${locale}/register?next=checkout`}
+                  className="rounded-full bg-brand-yellow px-6 py-2 font-semibold text-brand-brown"
+                >
+                  {a.register}
+                </Link>
+
+                <Link
+                  href={`/${locale}/login?next=checkout`}
+                  className="rounded-full border border-brand-yellow px-6 py-2 font-semibold text-brand-yellow"
+                >
+                  {a.login}
+                </Link>
+              </div>
+            </div>
+          )}
         </>
       )}
     </main>

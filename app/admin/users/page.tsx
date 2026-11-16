@@ -1,9 +1,15 @@
+
 import { requireAdmin } from "@/lib/admin";
 import { prisma } from "@/lib/prisma";
 import { decryptField } from "@/lib/crypto";
 import { formatPhone } from "@/lib/phone";
+import { readAddress } from "@/lib/profile";
 import ConfirmButton from "@/components/ConfirmButton";
-import { deleteUser, setRestricted, updateUser } from "@/app/admin/users/actions";
+import {
+  deleteUser,
+  setRestricted,
+  updateUser,
+} from "@/app/admin/users/actions";
 
 export default async function AdminUsersPage({
   searchParams,
@@ -42,6 +48,7 @@ export default async function AdminUsersPage({
         <h1 className="font-[family-name:var(--font-display)] text-4xl font-bold italic text-brand-yellow">
           Clients ({users.length})
         </h1>
+
         <form className="flex gap-2">
           <input
             name="q"
@@ -49,6 +56,7 @@ export default async function AdminUsersPage({
             placeholder="Nom ou e-mail"
             className={inputClass}
           />
+
           <button
             type="submit"
             className="rounded-full bg-brand-yellow px-5 py-1.5 text-sm font-semibold text-brand-brown"
@@ -61,6 +69,7 @@ export default async function AdminUsersPage({
       <ul className="mt-8 space-y-4">
         {users.map((user) => {
           const phone = user.phone ? decryptField(user.phone) : null;
+          const address = readAddress(user.address);
           const isSelf = user.id === admin.id;
 
           return (
@@ -73,10 +82,16 @@ export default async function AdminUsersPage({
                   <p className="text-lg font-semibold">
                     {user.name}
                     {isSelf && (
-                      <span className="ml-2 text-xs text-brand-cream/60">(vous)</span>
+                      <span className="ml-2 text-xs text-brand-cream/60">
+                        (vous)
+                      </span>
                     )}
                   </p>
-                  <p className="text-sm text-brand-cream/80">{user.email}</p>
+
+                  <p className="text-sm text-brand-cream/80">
+                    {user.email}
+                  </p>
+
                   {phone && (
                     <a
                       href={`tel:${phone}`}
@@ -85,11 +100,20 @@ export default async function AdminUsersPage({
                       📞 {formatPhone(phone)}
                     </a>
                   )}
+
+                  {address && (
+                    <p className="text-sm text-brand-cream/80">
+                      🏠 {address.street}, {address.postalCode} {address.city}
+                      {address.extra ? ` (${address.extra})` : ""}
+                    </p>
+                  )}
+
                   <p className="mt-1 text-xs text-brand-cream/60">
                     Inscrit le {dateFormat.format(user.createdAt)} ·{" "}
                     {user._count.orders} commande(s)
                   </p>
                 </div>
+
                 <div className="flex gap-2 text-xs font-semibold">
                   <span
                     className={`rounded-full px-3 py-1 ${
@@ -100,6 +124,7 @@ export default async function AdminUsersPage({
                   >
                     {user.role === "ADMIN" ? "Administrateur" : "Client"}
                   </span>
+
                   {user.restricted && (
                     <span className="rounded-full bg-red-500/20 px-3 py-1 text-red-300">
                       Restreint
@@ -117,6 +142,7 @@ export default async function AdminUsersPage({
                       name="restricted"
                       value={user.restricted ? "false" : "true"}
                     />
+
                     <ConfirmButton
                       message={
                         user.restricted
@@ -131,6 +157,7 @@ export default async function AdminUsersPage({
 
                   <form action={deleteUser}>
                     <input type="hidden" name="userId" value={user.id} />
+
                     <ConfirmButton
                       message="Supprimer définitivement ce compte ? Les commandes passées sont conservées mais anonymisées. Cette action est irréversible."
                       className="rounded-full border border-red-400 px-5 py-2 text-sm font-semibold text-red-300 hover:bg-red-500/10"
@@ -145,11 +172,13 @@ export default async function AdminUsersPage({
                 <summary className="cursor-pointer text-brand-cream/60">
                   Modifier
                 </summary>
+
                 <form
                   action={updateUser}
                   className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-4"
                 >
                   <input type="hidden" name="userId" value={user.id} />
+
                   <input
                     name="name"
                     defaultValue={user.name}
@@ -158,12 +187,14 @@ export default async function AdminUsersPage({
                     maxLength={80}
                     className={inputClass}
                   />
+
                   <input
                     name="phone"
                     defaultValue={phone ?? ""}
                     placeholder="06 12 34 56 78"
                     className={inputClass}
                   />
+
                   <select
                     name="role"
                     defaultValue={user.role}
@@ -173,6 +204,7 @@ export default async function AdminUsersPage({
                     <option value="CUSTOMER">Client</option>
                     <option value="ADMIN">Administrateur</option>
                   </select>
+
                   <button
                     type="submit"
                     className="rounded-full bg-brand-yellow px-5 py-1.5 font-semibold text-brand-brown"
