@@ -1,7 +1,12 @@
 "use client";
 
-import { useMemo, useSyncExternalStore } from "react";
-import { findDish } from "@/lib/menu";
+import {
+  createContext,
+  useContext,
+  useMemo,
+  useSyncExternalStore,
+} from "react";
+import type { Dish } from "@/lib/menu";
 
 type CartLine = { id: string; qty: number };
 
@@ -9,7 +14,7 @@ const STORAGE_KEY = "lamiral-cart";
 const MAX_QTY = 20;
 const EMPTY: CartLine[] = [];
 
-// --- Tiny store backed by localStorage ---------------------------------
+// --- Small store saved in the browser (localStorage) ---
 
 let cache: CartLine[] = EMPTY;
 let cacheRaw: string | null = null;
@@ -23,9 +28,8 @@ function parse(raw: string | null): CartLine[] {
     return parsed.filter(
       (line): line is CartLine =>
         typeof line?.id === "string" &&
-        typeof line?.qty === "number" &&
-        line.qty > 0 &&
-        findDish(line.id) !== undefined,
+        Number.isInteger(line?.qty) &&
+        line.qty > 0,
     );
   } catch {
     return EMPTY;
@@ -40,7 +44,7 @@ function getSnapshot(): CartLine[] {
       cache = parse(raw);
     }
   } catch {
-    // storage unavailable: keep the in-memory cart
+    // storage not available: keep the cart in memory
   }
   return cache;
 }
@@ -51,7 +55,7 @@ function getServerSnapshot(): CartLine[] {
 
 function subscribe(callback: () => void): () => void {
   listeners.add(callback);
-  window.addEventListener("storage", callback); // other browser tabs
+  window.addEventListener("storage", callback);
   return () => {
     listeners.delete(callback);
     window.removeEventListener("storage", callback);
@@ -65,12 +69,10 @@ function write(next: CartLine[]) {
     localStorage.setItem(STORAGE_KEY, raw);
     cacheRaw = raw;
   } catch {
-    // storage unavailable: cart still works until the page is closed
+    // ignore
   }
   listeners.forEach((listener) => listener());
 }
-
-// --- Cart actions -------------------------------------------------------
 
 function add(id: string) {
   const current = getSnapshot();
@@ -105,21 +107,36 @@ function clear() {
   write(EMPTY);
 }
 
-// --- Public API (same as before) ----------------------------------------
+// --- The dishes come from the database (given by the layout) ---
 
-export function CartProvider({ children }: { children: React.ReactNode }) {
-  return <>{children}</>;
+const DishesContext = createContext<Dish[]>([]);
+
+export function CartProvider({
+  children,
+  dishes,
+}: {
+  children: React.ReactNode;
+  dishes: Dish[];
+}) {
+  return (
+    <DishesContext.Provider value={dishes}>{children}</DishesContext.Provider>
+  );
 }
 
 export function useCart() {
-  const lines = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+  const stored = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+  const dishes = useContext(DishesContext);
 
   return useMemo(() => {
+    const byId = new Map(dishes.map((dish) => [dish.id, dish]));
+    // a dish that was hidden or deleted disappears from the cart
+    const lines = stored.filter((line) => byId.has(line.id));
     const count = lines.reduce((sum, line) => sum + line.qty, 0);
     const total = lines.reduce(
-      (sum, line) => sum + (findDish(line.id)?.price ?? 0) * line.qty,
+      (sum, line) => sum + (byId.get(line.id)?.price ?? 0) * line.qty,
       0,
     );
-    return { lines, count, total, add, setQty, remove, clear };
-  }, [lines]);
+    const find = (id: string) => byId.get(id);
+    return { lines, count, total, find, add, setQty, remove, clear };
+  }, [stored, dishes]);
 }

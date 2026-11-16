@@ -4,7 +4,7 @@
 import Link from "next/link";
 import { useCart } from "@/components/CartProvider";
 import type { Locale } from "@/lib/dictionaries";
-import { findDish, formatPrice } from "@/lib/menu";
+import { formatPrice } from "@/lib/menu";
 import { shopText } from "@/lib/shop-text";
 import { authText } from "@/lib/auth-text";
 
@@ -15,7 +15,7 @@ export default function CartView({
   locale: Locale;
   loggedIn: boolean;
 }) {
-  const { lines, total, setQty, remove } = useCart();
+  const { lines, total, setQty, remove, find } = useCart();
   const t = shopText[locale];
   const a = authText[locale];
 
@@ -39,7 +39,7 @@ export default function CartView({
         <>
           <ul className="mt-10 space-y-4">
             {lines.map((line) => {
-              const dish = findDish(line.id);
+              const dish = find(line.id);
               if (!dish) return null;
 
               return (
@@ -47,7 +47,15 @@ export default function CartView({
                   key={line.id}
                   className="flex items-center gap-4 rounded-2xl border border-brand-yellow/20 bg-brand-brown-light p-4"
                 >
-                  <div className="text-4xl">{dish.emoji}</div>
+                  {dish.image ? (
+                    <img
+                      src={dish.image}
+                      alt=""
+                      className="h-12 w-12 rounded-lg object-cover"
+                    />
+                  ) : (
+                    <div className="text-4xl">{dish.emoji}</div>
+                  )}
 
                   <div className="flex-1">
                     <p className="font-semibold">{dish.name[locale]}</p>

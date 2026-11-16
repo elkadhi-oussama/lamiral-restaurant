@@ -8,6 +8,7 @@ import { formatPrice } from "@/lib/menu";
 import { accountText } from "@/lib/account-text";
 import { authText } from "@/lib/auth-text";
 import { profileText } from "@/lib/profile-text";
+import { readAddress } from "@/lib/profile";
 import { logout } from "@/lib/auth-actions";
 
 export default async function AccountPage({
@@ -22,6 +23,13 @@ export default async function AccountPage({
   const user = await getCurrentUser();
 
   if (!user) redirect(`/${locale}/login`);
+
+  const row = await prisma.user.findUnique({
+    where: { id: user.id },
+    select: { address: true },
+  });
+
+  const address = readAddress(row?.address ?? null);
 
   const t = accountText[locale];
   const a = authText[locale];
@@ -91,6 +99,17 @@ export default async function AccountPage({
           <div className="flex justify-between gap-4">
             <dt className="text-brand-cream/60">{a.phone}</dt>
             <dd>{user.phone ?? "—"}</dd>
+          </div>
+
+          <div className="flex justify-between gap-4">
+            <dt className="text-brand-cream/60">{p.street}</dt>
+            <dd className="text-right">
+              {address
+                ? `${address.street}, ${address.postalCode} ${address.city}${
+                    address.extra ? ` (${address.extra})` : ""
+                  }`
+                : "—"}
+            </dd>
           </div>
         </dl>
 

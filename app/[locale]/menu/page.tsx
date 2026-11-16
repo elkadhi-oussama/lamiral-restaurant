@@ -1,6 +1,8 @@
+
 import { notFound } from "next/navigation";
 import { dictionaries, isLocale } from "@/lib/dictionaries";
 import AddToCartButton from "@/components/AddToCartButton";
+import DishImage from "@/components/DishImage";
 import { formatPrice } from "@/lib/menu";
 import { getMenu } from "@/lib/menu-db";
 
@@ -61,9 +63,8 @@ export default async function MenuPage({
                   key={dish.id}
                   className="flex flex-col overflow-hidden rounded-2xl border border-brand-yellow/20 bg-brand-brown-light"
                 >
-                  <div className="flex h-36 items-center justify-center bg-brand-brown text-6xl">
-                    {dish.emoji}
-                  </div>
+                  <DishImage dish={dish} className="h-36" />
+
                   <div className="flex flex-1 flex-col p-5">
                     <div className="flex items-start justify-between gap-3">
                       <h3 className="font-semibold text-brand-cream">
@@ -73,9 +74,11 @@ export default async function MenuPage({
                         {formatPrice(dish.price, locale)}
                       </span>
                     </div>
+
                     <p className="mt-2 flex-1 text-sm text-brand-cream/70">
                       {dish.description[locale]}
                     </p>
+
                     <AddToCartButton dishId={dish.id} locale={locale} />
                   </div>
                 </article>

@@ -11,6 +11,7 @@ export const metadata: Metadata = {
 const tabs = [
   { href: "/admin", label: "Commandes" },
   { href: "/admin/users", label: "Clients" },
+  { href: "/admin/menu", label: "Menu" },
 ];
 
 export default async function AdminLayout({

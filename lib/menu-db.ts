@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { prisma } from "@/lib/prisma";
 import type { Category, Dish } from "@/lib/menu";
 
@@ -23,7 +24,7 @@ function toDish(d: DbDish): Dish {
   };
 }
 
-export async function getMenu(): Promise<Category[]> {
+export const getMenu = cache(async (): Promise<Category[]> => {
   const categories = await prisma.category.findMany({
     orderBy: { position: "asc" },
     include: {
@@ -38,14 +39,13 @@ export async function getMenu(): Promise<Category[]> {
       name: { fr: category.nameFr, en: category.nameEn },
       dishes: category.dishes.map(toDish),
     }));
-}
+});
 
 export async function getDishesBySlugs(slugs: string[]): Promise<Dish[]> {
   const rows = await prisma.dish.findMany({
     where: { slug: { in: slugs }, available: true },
   });
 
-  // keep the order of the list we asked for
   return slugs
     .map((slug) => rows.find((row) => row.slug === slug))
     .filter((row) => row !== undefined)

@@ -4,8 +4,9 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useCart } from "@/components/CartProvider";
+import DishImage from "@/components/DishImage";
 import type { Locale } from "@/lib/dictionaries";
-import { findDish, formatPrice } from "@/lib/menu";
+import { formatPrice } from "@/lib/menu";
 import { shopText } from "@/lib/shop-text";
 import { placeOrder } from "@/app/[locale]/checkout/actions";
 
@@ -24,7 +25,7 @@ export default function CheckoutView({
   defaultName: string;
   defaultPhone: string;
 }) {
-  const { lines, total, clear } = useCart();
+  const { lines, total, clear, find } = useCart();
 
   const [order, setOrder] = useState<PlacedOrder | null>(null);
   const [pending, setPending] = useState(false);
@@ -141,7 +142,6 @@ export default function CheckoutView({
       </h1>
 
       <div className="mt-10 grid gap-8 md:grid-cols-5">
-
         {/* Form */}
         <form
           onSubmit={handleSubmit}
@@ -176,7 +176,7 @@ export default function CheckoutView({
               required
               defaultValue={defaultPhone}
               placeholder="06 12 34 56 78"
-              pattern="(?:(?:\+|00)33|0)\s*[1-9](?:[\s.\-]*\d{2}){4}"
+              pattern="(?:(?:\+|00)33|0)\s*[1-9](?:[\s.-]*\d{2}){4}"
               autoComplete="tel"
               className={inputClass}
             />
@@ -240,16 +240,21 @@ export default function CheckoutView({
 
           <ul className="mt-4 space-y-3 text-sm">
             {lines.map((line) => {
-              const dish = findDish(line.id);
+              const dish = find(line.id);
 
               if (!dish) return null;
 
               return (
                 <li
                   key={line.id}
-                  className="flex justify-between gap-3"
+                  className="flex items-center gap-3"
                 >
-                  <span>
+                  <DishImage
+                    dish={dish}
+                    className="h-12 w-12 shrink-0 rounded-lg"
+                  />
+
+                  <span className="flex-1">
                     {line.qty} × {dish.name[locale]}
                   </span>
 
@@ -269,7 +274,6 @@ export default function CheckoutView({
             </span>
           </div>
         </aside>
-
       </div>
     </main>
   );

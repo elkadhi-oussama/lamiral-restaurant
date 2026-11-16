@@ -1,8 +1,10 @@
+
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { dictionaries, isLocale } from "@/lib/dictionaries";
 import { restaurant } from "@/lib/restaurant";
 import AddToCartButton from "@/components/AddToCartButton";
+import DishImage from "@/components/DishImage";
 import { formatPrice } from "@/lib/menu";
 import { getDishesBySlugs } from "@/lib/menu-db";
 import { homeText, popularDishIds } from "@/lib/home-text";
@@ -16,6 +18,7 @@ export default async function Home({
 }) {
   const { locale } = await params;
   if (!isLocale(locale)) notFound();
+
   const t = dictionaries[locale].home;
   const h = homeText[locale];
   const popularDishes = await getDishesBySlugs(popularDishIds);
@@ -30,9 +33,13 @@ export default async function Home({
           L&apos;Amiral
         </h1>
 
-        <p className="mt-2 tracking-[0.5em] text-brand-yellow">RESTAURANT</p>
+        <p className="mt-2 tracking-[0.5em] text-brand-yellow">
+          RESTAURANT
+        </p>
         <p className="mt-6 text-brand-cream/70">{t.tagline}</p>
-        <p className="mt-6 max-w-md text-lg text-brand-cream/80">{t.welcome}</p>
+        <p className="mt-6 max-w-md text-lg text-brand-cream/80">
+          {t.welcome}
+        </p>
 
         <div className="mt-8 flex flex-wrap justify-center gap-4">
           <Link
@@ -75,12 +82,13 @@ export default async function Home({
                 key={dish.id}
                 className="flex flex-col overflow-hidden rounded-2xl border border-brand-yellow/20 bg-brand-brown-light"
               >
-                <div className="flex h-32 items-center justify-center bg-brand-brown text-6xl">
-                  {dish.emoji}
-                </div>
+                <DishImage dish={dish} className="h-32" />
+
                 <div className="flex flex-1 flex-col p-5">
                   <div className="flex items-start justify-between gap-3">
-                    <h3 className="font-semibold">{dish.name[locale]}</h3>
+                    <h3 className="font-semibold">
+                      {dish.name[locale]}
+                    </h3>
                     <span className="shrink-0 font-semibold text-brand-yellow">
                       {formatPrice(dish.price, locale)}
                     </span>
